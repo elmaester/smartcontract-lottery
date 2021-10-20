@@ -1,0 +1,22 @@
+{
+  "name": "smartcontract-lottery",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "fork-mainnet": "eval $(grep '^ALCHEMY_MAINNET_URL' .env) && npx hardhat node --fork $ALCHEMY_MAINNET_URL"
+  },
+  "author": "morket",
+  "license": "MIT",
+  "dependencies": {
+    "@chainlink/contracts": "^0.2.2",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "chai": "^4.3.4",
+    "dotenv": "^10.0.0",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.5.0",
+    "hardhat": "^2.6.6"
+  }
+}
