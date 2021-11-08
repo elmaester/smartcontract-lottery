@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { utils } = require("ethers");
 const { ethers } = require("hardhat");
-const priceFeeds = require("../priceFeeds");
+const priceFeeds = require("../chainlinkAddresses");
 
 // describe("Greeter", function () {
 //   it("Should return the new greeting once it's changed", async function () {
