@@ -27,7 +27,8 @@ describe("Lottery", function () {
     await lottery.deployed();
 
     // set this manually before running the test
-    const targetEthUsdPrice = 3885; // on October 20, 2021
+    // const targetEthUsdPrice = 3885; // on October 20, 2021
+    const targetEthUsdPrice = 4732; // on November 8, 2021
     const getUsdInWei = (usd) => parseInt(utils.parseEther((usd / targetEthUsdPrice).toFixed(18)));
     expect(await lottery.getEntranceFee()).to.be.above(`${getUsdInWei(50) * 0.95}`);
     expect(await lottery.getEntranceFee()).to.be.below(`${getUsdInWei(50) * 1.05}`);
