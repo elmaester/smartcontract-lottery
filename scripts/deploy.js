@@ -8,7 +8,7 @@ async function getLocalhostValues() {
   const mockVrf = await getContractFactory("VRFCoordinatorMock");
   const mockLink = await getContractFactory("LinkToken");
   const decimals = 8;
-  const initial_value = BigNumber.from("2" + "0".repeat(11));
+  const initial_value = BigNumber.from("472369500000"); // 4723.695 USD
   const _feed = await mockAgg.deploy(decimals, initial_value);
   const _link = await mockLink.deploy();
   const _vrf = await mockVrf.deploy(_link.address);
