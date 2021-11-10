@@ -24,8 +24,6 @@ contract Lottery is VRFConsumerBase, Ownable {
     uint256 public fee;
     bytes32 public keyHash;
 
-    // look up feed addresses at
-    // https://docs.chain.link/docs/ethereum-addresses/
     constructor(
         address priceFeed,
         address _vrfCoordinator,
@@ -41,7 +39,7 @@ contract Lottery is VRFConsumerBase, Ownable {
     }
 
     function enter() public payable {
-        require(lottery_state == LOTTERY_STATE.OPEN);
+        require(lottery_state == LOTTERY_STATE.OPEN, "The lottery is not open at this time");
         // $50 minimum
         require(msg.value >= getEntranceFee(), "Not enough ETH!");
         players.push(payable(msg.sender));
