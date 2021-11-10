@@ -9,15 +9,11 @@ async function startLottery(lottery) {
 async function enterLottery(lottery) {
   const signers = await hre.ethers.getSigners();
   const entranceFee = await lottery.getEntranceFee();
-  await lottery.enter({ value: entranceFee });
-  const lotteryAsUser1 = await lottery.connect(signers[1]);
-  await lotteryAsUser1.enter({ value: entranceFee });
-  const lotteryAsUser2 = await lottery.connect(signers[2]);
-  await lotteryAsUser2.enter({ value: entranceFee });
-  console.log(await lottery.players(0));
-  console.log(await lottery.players(1));
-  console.log(await lottery.players(2));
-  console.log(await lottery.owner());
+  await signers.slice(1, 8).forEach(async (signer) => {
+    const lotteryAsCurrentUser = await lottery.connect(signer);
+    console.log(lotteryAsCurrentUser.signer.address);
+    await lotteryAsCurrentUser.enter({ value: entranceFee });
+  });
 }
 
 async function fundWithLink(lottery) {
@@ -26,16 +22,12 @@ async function fundWithLink(lottery) {
       lottery.address,
       Number.MAX_SAFE_INTEGER - 20
     );
-    console.log("funding has worked?");
-    console.log((await lottery.mockLinkToken.balanceOf(lottery.address)).toString());
   }
 }
 
 async function endLottery(lottery) {
   await fundWithLink(lottery);
   await lottery.endLottery();
-  console.log(await lottery.lottery_state());
-  console.log(await lottery.recentWinner());
 }
 
 async function main() {
@@ -44,6 +36,27 @@ async function main() {
   await startLottery(lottery);
   await enterLottery(lottery);
   await endLottery(lottery);
+  console.log(
+    "lottery balance before:",
+    (await hre.ethers.provider.getBalance(lottery.address)).toString()
+  );
+  const requestId = (await lottery.queryFilter("RequestedRandomness"))[0].args
+    .requestId;
+  const getRandom = () => parseInt(Math.random() * 1000);
+  await lottery.mockVRF.callBackWithRandomness(
+    requestId,
+    getRandom(),
+    lottery.address
+  );
+  const eligiblePlayers = (await hre.ethers.getSigners())
+    .slice(1, 8)
+    .map((s) => s.address);
+  console.log(
+    "lottery balance after:",
+    (await hre.ethers.provider.getBalance(lottery.address)).toString()
+  );
+  console.log("eligible players:", eligiblePlayers);
+  console.log("winner", await lottery.recentWinner());
 }
 
 main()

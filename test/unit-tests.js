@@ -62,4 +62,35 @@ describe("Lottery", function () {
     await lottery.endLottery();
     expect(await lottery.lottery_state()).to.equal(2);
   });
+
+  it("Should choose the winner correctly", async function () {
+    const lottery = await deployLottery();
+    const getBalance = async (address) => (await ethers.provider.getBalance(address)).toString();
+    expect(await getBalance(lottery.address)).to.equal("0");
+    await lottery.startLottery();
+    const signers = await ethers.getSigners();
+    const entranceFee = await lottery.getEntranceFee();
+    signers.slice(1, 4).forEach(async (signer) => {
+      const lotteryAsCurrentUser = await lottery.connect(signer);
+      await lotteryAsCurrentUser.enter({ value: entranceFee });
+    });
+    await lottery.mockLinkToken.transfer(
+      lottery.address,
+      Number.MAX_SAFE_INTEGER - 20
+      );
+    expect(await getBalance(lottery.address)).to.equal("31754802119950587");
+    await lottery.endLottery();
+    const { requestId } = (await lottery.queryFilter("RequestedRandomness"))[0]
+      .args;
+    const getRandom = () => parseInt(Math.random() * 1000);
+    await lottery.mockVRF.callBackWithRandomness(
+      requestId,
+      getRandom(),
+      lottery.address
+    );
+    expect(await getBalance(lottery.address)).to.equal("0");
+    const eligiblePlayers = signers.slice(1, 4).map((s) => s.address);
+    const recentWinner = await lottery.recentWinner();
+    expect(eligiblePlayers).to.include(recentWinner);
+  });
 });

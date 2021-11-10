@@ -19,6 +19,7 @@ async function getLocalhostValues() {
     fee: addresses.fee,
     keyHash: addresses.keyHash,
     mockLinkToken: _link,
+    mockVRF: _vrf
   };
 }
 
@@ -29,7 +30,7 @@ function getValues() {
 }
 
 async function deployLottery() {
-  const { priceFeed, vrfCoordinator, link, fee, keyHash, mockLinkToken } =
+  const { priceFeed, vrfCoordinator, link, fee, keyHash, mockLinkToken, mockVRF } =
     await getValues();
   const Lottery = await getContractFactory("Lottery");
   const lottery = await Lottery.deploy(
@@ -46,6 +47,9 @@ async function deployLottery() {
 
   if (mockLinkToken) {
     lottery.mockLinkToken = mockLinkToken;
+  }
+  if (mockVRF) {
+    lottery.mockVRF = mockVRF;
   }
 
   return lottery;
