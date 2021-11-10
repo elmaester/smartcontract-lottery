@@ -1,24 +1,6 @@
 const { expect } = require("chai");
-const { utils } = require("ethers");
 const { ethers } = require("hardhat");
 const deployLottery = require("../scripts/deploy");
-
-// describe("Greeter", function () {
-//   it("Should return the new greeting once it's changed", async function () {
-//     const Greeter = await ethers.getContractFactory("Greeter");
-//     const greeter = await Greeter.deploy("Hello, world!");
-//     await greeter.deployed();
-
-//     expect(await greeter.greet()).to.equal("Hello, world!");
-
-//     const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
-
-//     // wait until the transaction is mined
-//     await setGreetingTx.wait();
-
-//     expect(await greeter.greet()).to.equal("Hola, mundo!");
-//   });
-// });
 
 describe("Lottery", function () {
   it("Should correctly fetch the ETH/USD exchange ratio", async function () {
@@ -29,7 +11,7 @@ describe("Lottery", function () {
     // const targetEthUsdPrice = 4732; // on November 8, 2021
     const targetEthUsdPrice = 4723; // on November 10, 2021
     const getUsdInWei = (usd) =>
-      parseInt(utils.parseEther((usd / targetEthUsdPrice).toFixed(18)));
+      parseInt(ethers.utils.parseEther((usd / targetEthUsdPrice).toFixed(18)));
     const entranceFee = await lottery.getEntranceFee();
     const usd50inWei = getUsdInWei(50);
     expect(entranceFee).to.be.above(`${usd50inWei * 0.95}`);
@@ -48,7 +30,9 @@ describe("Lottery", function () {
 
   it("Should be able to start lottery and then enter", async function () {
     const lottery = await deployLottery();
+    expect(await lottery.lottery_state()).to.equal(1);
     await lottery.startLottery();
+    expect(await lottery.lottery_state()).to.equal(0);
     const signers = await ethers.getSigners();
     const entranceFee = await lottery.getEntranceFee();
     const expectedUser1Address = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
